@@ -320,9 +320,7 @@ class EasyLearnApp {
     // 3. DOM ELEMENTS CACHING
     // ==========================================
     initDOM() {
-        // Theme & Navigation
-        this.themeToggleBtn = document.getElementById('themeToggleBtn');
-        this.themeIcon = document.getElementById('themeIcon');
+        // Navigation
         this.navTabs = document.querySelectorAll('.nav-tab');
         this.bottomNavItems = document.querySelectorAll('.bottom-nav-item');
         this.bottomNavVocabBadge = document.getElementById('bottomNavVocabBadge');
@@ -837,7 +835,6 @@ class EasyLearnApp {
         if (this.btnRateAgain) this.btnRateAgain.addEventListener('click', () => this.rateFlashcard(0));
         if (this.btnRateGood) this.btnRateGood.addEventListener('click', () => this.rateFlashcard(1));
         if (this.btnRateEasy) this.btnRateEasy.addEventListener('click', () => this.rateFlashcard(2));
-        if (this.themeToggleBtn) this.themeToggleBtn.addEventListener('click', () => this.toggleTheme());
         if (this.btnStatsGoFlashcards) this.btnStatsGoFlashcards.addEventListener('click', () => this.switchView('flashcards'));
         if (this.btnStatsGoQuiz) this.btnStatsGoQuiz.addEventListener('click', () => this.switchView('quiz'));
 
@@ -972,29 +969,11 @@ class EasyLearnApp {
     }
 
     initTheme() {
-        const savedTheme = localStorage.getItem('easylearn_theme');
-        const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-        this.applyTheme(theme);
-    }
-
-    applyTheme(theme) {
-        this.theme = theme;
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('easylearn_theme', theme);
-        if (this.themeIcon) {
-            this.themeIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        }
-        if (this.themeToggleBtn) {
-            this.themeToggleBtn.setAttribute('title', theme === 'dark' ? "Yorug' rejimga o'tish" : "Tungi rejimga o'tish");
-        }
-    }
-
-    toggleTheme() {
-        const nextTheme = this.theme === 'dark' ? 'light' : 'dark';
-        this.applyTheme(nextTheme);
-        this.playPopSound(nextTheme === 'dark' ? 440 : 600);
-        this.showToast(nextTheme === 'dark' ? "Tungi rejim yoqildi" : "Yorug' rejim yoqildi", "info");
+        // Enforce clean light mode permanently
+        try {
+            localStorage.removeItem('easylearn_theme');
+            document.documentElement.removeAttribute('data-theme');
+        } catch (e) {}
     }
 
     // ==========================================
