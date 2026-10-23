@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>EasyLearn</title>
+    <meta name="description"
+        content="Yangi so'zlarni o'zingiz kiritib, fleshkartalar, testlar va qiziqarli mashqlar orqali oson yodlash ilovasi.">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EasyLearn">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Header / Navbar -->
+    <header class="app-header">
+        <div class="header-container">
+
+            <!-- Quick Stats Pills (Clean, subtle) -->
+            <div class="header-stats">
+                <div class="stat-pill" title="Jami so'zlar soni">
+                    <i class="fa-solid fa-book-bookmark text-primary"></i>
+                    <span class="stat-num" id="headerTotalWords">0</span>
+                    <span class="stat-label">so'z</span>
+                </div>
+                <div class="stat-pill" title="To'liq yodlangan so'zlar">
+                    <i class="fa-solid fa-circle-check text-success"></i>
+                    <span class="stat-num" id="headerMasteredWords">0</span>
+                    <span class="stat-label">yodlandi</span>
+                </div>
+                <div class="stat-pill" title="Bugungi mashq seriyasi">
+                    <i class="fa-solid fa-fire text-warning"></i>
+                    <span class="stat-num" id="headerStreak">1</span>
+                    <span class="stat-label">kun</span>
+                </div>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <button class="btn btn-icon" id="themeToggleBtn" title="Tungi / Yorug' rejim (Theme)">
+                    <i class="fa-solid fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm header-guide-btn" id="btnOpenTutorial" title="Qo'llanma va animatsiyalar">
+                    <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
+                    <span>Qo'llanma</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnExportImportModal" title="Zaxira nusxa / Import">
+                    <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                    <span>Zaxira</span>
+                </button>
+                <button class="btn btn-primary btn-sm" id="btnOpenAddModal">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>So'z qo'shish</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs-wrapper">
+        <div class="nav-tabs-container">
+            <button class="nav-tab active" data-view="vocabulary">
+                <i class="fa-solid fa-list-ul"></i>
+                <span>Mening Lug'atim</span>
+                <span class="tab-badge" id="vocabCountBadge">0</span>
+            </button>
+            <button class="nav-tab" data-view="flashcards">
+                <i class="fa-solid fa-clone"></i>
+                <span>Fleshkarta</span>
+            </button>
+            <button class="nav-tab" data-view="quiz">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Test (Quiz)</span>
+            </button>
+            <button class="nav-tab" data-view="writing">
+                <i class="fa-solid fa-keyboard"></i>
+                <span>Yozish Mashqi</span>
+            </button>
+            <button class="nav-tab" data-view="matching">
+                <i class="fa-solid fa-puzzle-piece"></i>
+                <span>Juftlik O'yini</span>
+            </button>
+            <button class="nav-tab" data-view="synonymquiz">
+                <i class="fa-solid fa-equals"></i>
+                <span>Sinonim Testi</span>
+            </button>
+            <button class="nav-tab" data-view="stats">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Statistika</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+
+        <!-- ================= VIEW 1: LUG'AT (VOCABULARY LIST) ================= -->
+        <section class="view-section active" id="vocabularyView">
+
+            <!-- Hidden container for banner script compatibility -->
+            <div id="motivationBanner" style="display: none;">
+                <span id="motivationTitle"></span>
+                <span id="motivationText"></span>
+            </div>
+
+            <!-- Compact 1-Line Quick Add Strip -->
+            <div class="quick-add-card" id="quickAddCard">
+                <div class="quick-add-header" id="quickAddToggleHeader">
+                    <div class="quick-add-title">
+                        <i class="fa-solid fa-bolt text-warning"></i>
+                        <span>Tezkor so'z qo'shish</span>
+                    </div>
+                    <button type="button" class="quick-collapse-btn" id="btnToggleQuickAdd"
+                        aria-label="Tezkor qo'shishni yig'ish / yoyish">
+                        <i class="fa-solid fa-chevron-down" id="quickAddChevron"></i>
+                    </button>
+                </div>
+                <form id="quickAddForm" class="quick-add-form">
+                    <div class="quick-input-group">
+                        <span class="input-lang-badge en">EN</span>
+                        <input type="text" id="quickWordInput" placeholder="Inglizcha so'z" autocomplete="off" required>
+                    </div>
+                    <div class="quick-input-group">
+                        <span class="input-lang-badge uz">UZ</span>
+                        <input type="text" id="quickTranslationInput" placeholder="O'zbekcha tarjima" autocomplete="off"
+                            required>
+                    </div>
+                    <div class="quick-input-group quick-date-group">
+                        <span class="input-lang-badge date"><i class="fa-regular fa-calendar"></i></span>
+                        <input type="date" id="quickDateInput" required title="Yodlash kuni">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm quick-add-btn" id="btnQuickAdd">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Qo'shish</span>
+                    </button>
+                </form>
+                <!-- Interactive Spotlight Guided Tip for New Users -->
+                <div class="quick-add-spotlight-tip hidden" id="quickAddSpotlightTip">
+                    <div class="spotlight-tip-content">
+                        <i class="fa-solid fa-hand-point-up text-warning"></i>
+                        <span><strong>Birinchi so'zingizni qo'shing:</strong> Masalan, chapga <em>"Book"</em>, o'ngga <em>"Kitob"</em> deb yozib <code>Enter</code> bosing!</span>
+                    </div>
+                    <button type="button" class="spotlight-tip-close" id="btnCloseSpotlightTip" aria-label="Yopish">&times;</button>
+                </div>
+            </div>
+
+            <!-- Filter & Action Bar -->
+            <div class="toolbar-card">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Qidirish...">
+                    <button class="clear-search" id="clearSearchBtn" title="Tozalash">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="filter-controls">
+                    <div class="filter-actions-group">
+                        <!-- Starter Packs Button -->
+                        <button class="btn btn-secondary btn-sm" id="btnOpenPacksToolbar"
+                            title="Tayyor mavzuli lug'at to'plamlari">
+                            <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
+                            <span>To'plamlar</span>
+                        </button>
+
+                        <!-- Quick Bulk Add -->
+                        <button class="btn btn-secondary btn-sm" id="btnOpenBulkModal" title="Ommaviy kiritish">
+                            <i class="fa-solid fa-file-import"></i>
+                            <span>Ommaviy</span>
+                        </button>
+                    </div>
+
+                    <div class="filter-selects-group">
+                        <!-- Day / Date Filter -->
+                        <div class="select-wrapper date-filter-wrapper"
+                            title="Lug'atni kun bo'yicha ko'rish va yodlash">
+                            <select id="dateFilter">
+                                <option value="all">Barcha kunlar</option>
+                                <option value="today">Bugun</option>
+                                <option value="yesterday">Kecha</option>
+                            </select>
+                            <input type="date" id="customDateFilterInput" class="custom-date-picker hidden"
+                                title="Aniq sanani tanlang">
+                        </div>
+
+                        <!-- Level Select -->
+                        <div class="select-wrapper">
+                            <select id="levelFilter">
+                                <option value="all">Barcha daraja</option>
+                                <option value="new">Yangi (0%)</option>
+                                <option value="learning">O'rganilmoqda (50%)</option>
+                                <option value="mastered">Yodlandi (100%)</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort Select -->
+                        <div class="select-wrapper">
+                            <select id="sortOrder">
+                                <option value="newest">Eng yangi</option>
+                                <option value="oldest">Eng eski</option>
+                                <option value="alpha-asc">A-Z</option>
+                                <option value="alpha-desc">Z-A</option>
+                                <option value="mastery-asc">Kam o'rganilgan</option>
+                                <option value="mastery-desc">Ko'p o'rganilgan</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Filter Badges & Results Count -->
+            <div class="results-info-row">
+                <div class="results-count">
+                    Ko'rsatilmoqda: <strong id="displayedCount">0</strong> ta so'z
+                    <span id="activeDateFilterBadge" class="active-date-badge hidden">
+                        <i class="fa-regular fa-calendar-check"></i> <span id="activeDateFilterText"></span>
+                        <button type="button" id="btnResetDateFilter" title="Barcha kunlarga qaytish">&times;</button>
+                    </span>
+                </div>
+                <div class="quick-study-buttons">
+                    <button class="btn btn-primary btn-sm" id="btnStudyFilteredFlashcards">
+                        <i class="fa-solid fa-play"></i> Fleshkartada yodlash
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vocabulary Cards / Grid -->
+            <div class="words-grid" id="wordsGrid">
+                <!-- Word Cards will be dynamically inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="emptyVocabState">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <h3>Hozircha hech qanday so'z topilmadi</h3>
+                <p>O'zingiz yodlamoqchi bo'lgan so'zlarni qo'shing yoki ommaviy yuklang!</p>
+                <div class="empty-buttons">
+                    <button class="btn btn-primary" id="emptyAddBtn">
+                        <i class="fa-solid fa-plus"></i> Yangi so'z qo'shish
+                    </button>
+                    <button class="btn btn-secondary" id="emptyPacksBtn">
+                        <i class="fa-solid fa-wand-magic-sparkles text-warning"></i> Tayyor to'plamlar
+                    </button>
+                    <button class="btn btn-secondary" id="emptyBulkBtn">
+                        <i class="fa-solid fa-file-import"></i> Ommaviy kiritish
+                    </button>
+                    <button class="btn btn-outline" id="emptyTutorialBtn">
+                        <i class="fa-solid fa-circle-play text-primary"></i> Qanday ishlaydi? (Qo'llanma)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 2: FLASHCARDS ================= -->
+        <section class="view-section" id="flashcardsView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-clone text-primary"></i> Fleshkartalar</h2>
+                </div>
+                <div class="study-settings">
+                    <div class="study-day-picker-box" title="Qaysi kundagi so'zlarni yodlash">
+                        <i class="fa-regular fa-calendar-check text-primary"></i>
+                        <select id="flashcardDaySelect" class="study-day-select">
+                            <!-- populated dynamically by JS -->
+                        </select>
+                    </div>
+                    <button class="btn btn-icon" id="btnShuffleFlashcards" title="Aralashtirish">
+                        <i class="fa-solid fa-shuffle"></i>
+                    </button>
+                    <button class="btn btn-icon" id="btnToggleCardSide" title="Boshlanish tomonini almashtirish">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="study-progress-container">
+                <div class="progress-bar-bg" id="flashcardProgressFill">
+                    <!-- Dots will be inserted here by JS -->
+                </div>
+                <div class="progress-text">
+                    Karta: <span id="currentCardIndex">1</span> / <span id="totalCardsCount">0</span>
+                </div>
+            </div>
+
+            <!-- 3D Flashcard Component -->
+            <div class="flashcard-scene">
+                <div class="flashcard-3d" id="flashcardElement" tabindex="0" role="button"
+                    aria-label="Fleshkarta: Aylantirish uchun bosing">
+
+                    <!-- FRONT SIDE -->
+                    <div class="card-face card-front">
+                        <div class="card-top-row">
+                            <button class="btn-sound-card" id="btnFrontAudio" title="Talaffuzni tinglash">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+
+                        <div class="card-center-content">
+                            <span class="card-lang-hint" id="cardFrontLangLabel">INGLIZCHA</span>
+                            <h2 class="card-main-word" id="cardFrontWord">Word</h2>
+                            <p class="card-phonetic" id="cardFrontPhonetic"></p>
+                            <div class="card-synonyms-row" id="cardFrontSynonyms" style="display:none;"></div>
+                            <p class="card-example" id="cardFrontExample"></p>
+                        </div>
+
+                        <div class="card-bottom-hint">
+                            <i class="fa-solid fa-rotate"></i> Aylantirish
+                        </div>
+                    </div>
+
+                    <!-- BACK SIDE -->
+                    <div class="card-face card-back">
+                        <div class="card-top-row">
+                            <span class="badge level-badge" id="cardBackLevel">O'rganilmoqda</span>
+                        </div>
+
+                        <div class="card-center-content">
+                            <span class="card-lang-hint" id="cardBackLangLabel">TARJIMA</span>
+                            <h2 class="card-main-word" id="cardBackTranslation">Tarjimasi</h2>
+                            <div class="card-synonyms-row" id="cardBackSynonyms" style="display:none;"></div>
+                            <p class="card-example-trans" id="cardBackExampleTrans"></p>
+                        </div>
+
+                        <div class="card-bottom-hint">
+                            <i class="fa-solid fa-rotate"></i> Aylantirish
+                        </div>
+                    </div>
+
+                    <!-- Swipe Gesture Visual Badges (Mobile) -->
+                    <div class="swipe-hint-indicator swipe-hint-prev" id="swipeHintPrev">
+                        <i class="fa-solid fa-arrow-left"></i> Oldingisi
+                    </div>
+                    <div class="swipe-hint-indicator swipe-hint-next" id="swipeHintNext">
+                        Keyingisi <i class="fa-solid fa-arrow-right"></i>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <!-- Navigation Controls -->
+            <div class="flashcard-nav-row">
+                <button class="btn btn-secondary btn-sm" id="btnPrevCard" title="Oldingi karta [←]">
+                    <i class="fa-solid fa-arrow-left"></i> Oldingisi
+                </button>
+                <button class="btn btn-outline btn-sm" id="btnFlipCardAction" title="Kartani aylantirish [Space]">
+                    <i class="fa-solid fa-rotate"></i> Aylantirish <kbd class="kbd-badge">Space</kbd>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnNextCard" title="Keyingi karta [→]">
+                    Keyingisi <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 3: TEST (QUIZ) ================= -->
+        <section class="view-section" id="quizView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-circle-question text-primary"></i> Variantli Test</h2>
+                </div>
+                <div class="study-settings">
+                    <div class="study-day-picker-box" title="Qaysi kundagi so'zlardan test olish">
+                        <i class="fa-regular fa-calendar-check text-primary"></i>
+                        <select id="quizDaySelect" class="study-day-select">
+                            <!-- populated dynamically by JS -->
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnRestartQuiz">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Qaytadan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Play Box -->
+            <div class="quiz-container" id="quizContainer">
+                <div class="quiz-status-bar">
+                    <div class="quiz-counter">
+                        Savol: <span id="quizQuestionIndex">1</span> / <span id="quizTotalQuestions">10</span>
+                    </div>
+                    <div class="quiz-score-pill">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        Ball: <span id="quizCurrentScore">0</span>
+                    </div>
+                    <div class="quiz-streak-pill streak-active">
+                        <i class="fa-solid fa-bolt text-primary"></i>
+                        Ketma-ket: <span id="quizCurrentStreak">0</span>
+                    </div>
+                </div>
+
+                <div class="quiz-card">
+                    <div class="quiz-question-type" id="quizQuestionType">INGLIZCHA SO'Z:</div>
+                    <div class="quiz-prompt-row">
+                        <h2 class="quiz-prompt-word" id="quizPromptWord">Opportunity</h2>
+                        <button class="btn-sound-card" id="btnQuizAudio" title="Eshitish">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <p class="quiz-hint-text" id="quizPromptHint"></p>
+
+                    <!-- 4 Options Grid -->
+                    <div class="quiz-options-grid" id="quizOptionsGrid">
+                        <!-- Option buttons will be dynamically created -->
+                    </div>
+
+                    <div class="quiz-feedback-banner hidden" id="quizFeedbackBanner">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-next-row">
+                    <button class="btn btn-primary btn-lg hidden" id="btnNextQuizQuestion">
+                        Keyingi savol <kbd class="kbd-badge">Enter ↵</kbd>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Result Summary (Initially Hidden) -->
+            <div class="quiz-results-card hidden" id="quizResultsCard">
+                <div class="results-header">
+                    <div class="trophy-icon" id="quizTrophyIcon"><i class="fa-solid fa-trophy text-warning"></i></div>
+                    <h2 id="quizResultTitle">Ajoyib natija!</h2>
+                    <p id="quizResultSubtitle">Siz barcha savollarni yakunladingiz</p>
+                </div>
+
+                <div class="results-stats-grid">
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-success" id="quizCorrectCount">0</div>
+                        <div class="res-stat-label">To'g'ri javoblar</div>
+                    </div>
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-danger" id="quizWrongCount">0</div>
+                        <div class="res-stat-label">Xatolar</div>
+                    </div>
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-primary" id="quizAccuracyPercent">0%</div>
+                        <div class="res-stat-label">Aniqlik</div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary btn-lg" id="btnQuizPlayAgain">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Yana sinab ko'rish
+                    </button>
+                    <button class="btn btn-secondary btn-lg" id="btnQuizGoToVocab">
+                        <i class="fa-solid fa-list-ul"></i> Lug'atga qaytish
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 4: WRITING PRACTICE (YOZMA MASHQ) ================= -->
+        <section class="view-section" id="writingView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-keyboard text-primary"></i> Yozma Mashq</h2>
+                </div>
+                <div class="study-settings">
+                    <div class="study-day-picker-box" title="Qaysi kundagi so'zlarni yozish">
+                        <i class="fa-regular fa-calendar-check text-primary"></i>
+                        <select id="writingDaySelect" class="study-day-select">
+                            <!-- populated dynamically by JS -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="writing-container">
+                <div class="writing-progress-bar">
+                    <div class="writing-progress-fill" id="writingProgressFill" style="width: 0%;"></div>
+                </div>
+
+                <div class="writing-card">
+                    <div class="writing-prompt-header">
+                        <span class="writing-counter" id="writingCounterText">1 / 10</span>
+                    </div>
+
+                    <div class="writing-target-translation">
+                        <span class="target-label">Tarjimasi:</span>
+                        <h2 class="target-text" id="writingTargetTranslation">Muvaffaqiyat</h2>
+                        <p class="target-example" id="writingTargetExample"></p>
+                    </div>
+
+                    <!-- Hint Letters Box -->
+                    <div class="writing-hint-display" id="writingHintDisplay">
+                        <!-- Hint letters / blanks -->
+                    </div>
+
+                    <!-- Input Form -->
+                    <form class="writing-form" id="writingForm" onsubmit="return false;">
+                        <div class="input-with-action">
+                            <input type="text" id="writingInput" autocomplete="off" autocorrect="off"
+                                autocapitalize="off" spellcheck="false" placeholder="So'zni yozing..." autofocus>
+                            <button type="submit" class="btn btn-primary" id="btnSubmitWriting">
+                                <i class="fa-solid fa-check"></i> Tekshirish
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Hint / Audio buttons -->
+                    <div class="writing-actions-row">
+                        <button class="btn btn-outline btn-sm" id="btnWritingHint">
+                            <i class="fa-solid fa-lightbulb"></i> Maslahat
+                        </button>
+                        <button class="btn btn-outline btn-sm" id="btnWritingAudio" title="Ovozni eshitish">
+                            <i class="fa-solid fa-volume-high"></i> Ovoz
+                        </button>
+                        <button class="btn btn-secondary btn-sm" id="btnWritingSkip">
+                            O'tkazish <i class="fa-solid fa-forward"></i>
+                        </button>
+                    </div>
+
+                    <!-- Feedback message -->
+                    <div class="writing-feedback hidden" id="writingFeedback"></div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 5: MATCHING GAME (JUFTLIKNI TOP) ================= -->
+        <section class="view-section" id="matchingView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-puzzle-piece text-primary"></i> Juftlikni Top</h2>
+                </div>
+                <div class="study-settings">
+                    <div class="study-day-picker-box" title="Qaysi kundagi so'zlar bilan o'ynash">
+                        <i class="fa-regular fa-calendar-check text-primary"></i>
+                        <select id="matchingDaySelect" class="study-day-select">
+                            <!-- populated dynamically by JS -->
+                        </select>
+                    </div>
+                    <div class="game-timer-pill">
+                        <i class="fa-solid fa-stopwatch text-warning"></i>
+                        <span id="matchTimerText">00:00</span>
+                    </div>
+                    <div class="game-pairs-pill">
+                        <i class="fa-solid fa-link text-success"></i>
+                        <span id="matchPairsLeft">0</span> juft
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnRestartMatchGame">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Yangi
+                    </button>
+                </div>
+            </div>
+
+            <div class="match-game-container">
+                <div class="match-grid" id="matchGrid">
+                    <!-- Dynamic shuffled tiles -->
+                </div>
+
+                <!-- Match Complete Modal / Overlay -->
+                <div class="match-complete-card hidden" id="matchCompleteCard">
+                    <div class="trophy-icon"><i class="fa-solid fa-trophy text-warning"></i></div>
+                    <h2>Qoyilmaqom!</h2>
+                    <p>Barcha juftliklar <strong id="finalMatchTime">00:00</strong> soniyada muvaffaqiyatli topildi!</p>
+                    <div class="match-complete-actions">
+                        <button class="btn btn-primary btn-lg" id="btnPlayMatchAgain">
+                            <i class="fa-solid fa-play"></i> Yana o'ynash
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 6: SINONIM TESTI ================= -->
+        <section class="view-section" id="synonymquizView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-equals text-primary"></i> Sinonim Testi</h2>
+                </div>
+                <div class="study-settings">
+                    <div class="study-day-picker-box" title="Qaysi kundagi so'zlardan test olish">
+                        <i class="fa-regular fa-calendar-check text-primary"></i>
+                        <select id="synonymQuizDaySelect" class="study-day-select">
+                            <!-- populated dynamically by JS -->
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" id="btnRestartSynonymQuiz">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Qaytadan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Synonym Quiz Play Box -->
+            <div class="quiz-container" id="synonymQuizContainer">
+                <div class="quiz-status-bar">
+                    <div class="quiz-counter">
+                        Savol: <span id="synonymQuizQuestionIndex">1</span> / <span
+                            id="synonymQuizTotalQuestions">10</span>
+                    </div>
+                    <div class="quiz-score-pill">
+                        <i class="fa-solid fa-star text-warning"></i>
+                        Ball: <span id="synonymQuizCurrentScore">0</span>
+                    </div>
+                    <div class="quiz-streak-pill streak-active">
+                        <i class="fa-solid fa-bolt text-primary"></i>
+                        Ketma-ket: <span id="synonymQuizCurrentStreak">0</span>
+                    </div>
+                </div>
+
+                <div class="quiz-card">
+                    <div class="quiz-question-type">SO'ZNING SINONIMI QAYSI?</div>
+                    <div class="quiz-prompt-row">
+                        <div class="synonym-quiz-word-display" id="synonymQuizPromptWord">
+                            <span class="syn-quiz-word">Persistence</span>
+                            <span class="syn-quiz-translation">(Qat'iyatlik)</span>
+                        </div>
+                        <button class="btn-sound-card" id="btnSynonymQuizAudio" title="Eshitish">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+
+                    <!-- 4 Options Grid -->
+                    <div class="quiz-options-grid" id="synonymQuizOptionsGrid">
+                        <!-- Option buttons will be dynamically created -->
+                    </div>
+
+                    <div class="quiz-feedback-banner hidden" id="synonymQuizFeedbackBanner">
+                        <div class="feedback-icon" id="synonymFeedbackIcon"></div>
+                        <div class="feedback-text" id="synonymFeedbackText"></div>
+                    </div>
+                </div>
+
+                <div class="quiz-next-row">
+                    <button class="btn btn-primary btn-lg hidden" id="btnNextSynonymQuestion">
+                        Keyingi savol <kbd class="kbd-badge">Enter ↵</kbd>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Synonym Quiz Results Card -->
+            <div class="quiz-results-card hidden" id="synonymQuizResultsCard">
+                <div class="results-header">
+                    <div class="trophy-icon" id="synonymQuizTrophyIcon"><i class="fa-solid fa-trophy text-warning"></i>
+                    </div>
+                    <h2 id="synonymQuizResultTitle">Ajoyib!</h2>
+                    <p id="synonymQuizResultSubtitle">Siz barcha sinonim savollarini yakunladingiz</p>
+                </div>
+
+                <div class="results-stats-grid">
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-success" id="synonymQuizCorrectCount">0</div>
+                        <div class="res-stat-label">To'g'ri javoblar</div>
+                    </div>
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-danger" id="synonymQuizWrongCount">0</div>
+                        <div class="res-stat-label">Xatolar</div>
+                    </div>
+                    <div class="res-stat-box">
+                        <div class="res-stat-value text-primary" id="synonymQuizAccuracyPercent">0%</div>
+                        <div class="res-stat-label">Aniqlik</div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary btn-lg" id="btnSynonymQuizPlayAgain">
+                        <i class="fa-solid fa-arrow-rotate-right"></i> Yana sinab ko'rish
+                    </button>
+                    <button class="btn btn-secondary btn-lg" id="btnSynonymQuizGoToVocab">
+                        <i class="fa-solid fa-list-ul"></i> Lug'atga qaytish
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 7 (was 6): STATISTIKA ================= -->
+        <section class="view-section" id="statsView">
+            <div class="study-header">
+                <div class="study-info">
+                    <h2><i class="fa-solid fa-chart-pie text-primary"></i> Statistika</h2>
+                </div>
+                <button class="btn btn-outline btn-sm" id="btnResetStats">
+                    <i class="fa-solid fa-arrows-rotate"></i> Yangilash
+                </button>
+            </div>
+
+            <div class="stats-overview-grid">
+                <div class="stats-card stat-card-total">
+                    <div class="stat-card-icon"><i class="fa-solid fa-book"></i></div>
+                    <div class="stat-card-data">
+                        <span class="stat-card-title">Jami</span>
+                        <h3 class="stat-card-value" id="statsTotalWords">0</h3>
+                    </div>
+                </div>
+                <div class="stats-card stat-card-mastered">
+                    <div class="stat-card-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="stat-card-data">
+                        <span class="stat-card-title">Yodlangan</span>
+                        <h3 class="stat-card-value" id="statsMasteredWords">0</h3>
+                    </div>
+                </div>
+                <div class="stats-card stat-card-learning">
+                    <div class="stat-card-icon"><i class="fa-solid fa-spinner"></i></div>
+                    <div class="stat-card-data">
+                        <span class="stat-card-title">O'rganilmoqda</span>
+                        <h3 class="stat-card-value" id="statsLearningWords">0</h3>
+                    </div>
+                </div>
+                <div class="stats-card stat-card-new">
+                    <div class="stat-card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                    <div class="stat-card-data">
+                        <span class="stat-card-title">Yangi</span>
+                        <h3 class="stat-card-value" id="statsNewWords">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Learning Analytics -->
+            <div class="stats-detail-grid">
+                <!-- Retention & Mastery Rate Card -->
+                <div class="stats-analytics-card">
+                    <div class="analytics-header">
+                        <div class="analytics-title-group">
+                            <i class="fa-solid fa-shield-halved text-success"></i>
+                            <div>
+                                <h4>O'zlashtirish Darajasi</h4>
+                            </div>
+                        </div>
+                        <div class="analytics-rate-badge" id="statsMasteryRateBadge">0%</div>
+                    </div>
+
+                    <div class="stats-segmented-bar" id="statsSegmentedBar">
+                        <div class="seg-fill seg-mastered" id="segMastered" style="width: 0%;" title="Yodlandi"></div>
+                        <div class="seg-fill seg-learning" id="segLearning" style="width: 0%;" title="O'rganilmoqda">
+                        </div>
+                        <div class="seg-fill seg-new" id="segNew" style="width: 0%;" title="Yangi"></div>
+                    </div>
+
+                    <div class="stats-legend-row">
+                        <div class="legend-item"><span class="legend-dot dot-mastered"></span> Yodlangan: <strong
+                                id="legendMasteredCount">0</strong></div>
+                        <div class="legend-item"><span class="legend-dot dot-learning"></span> O'rganilmoqda: <strong
+                                id="legendLearningCount">0</strong></div>
+                        <div class="legend-item"><span class="legend-dot dot-new"></span> Yangi: <strong
+                                id="legendNewCount">0</strong></div>
+                    </div>
+                </div>
+
+                <!-- Daily Goal & Streak Card -->
+                <div class="stats-analytics-card">
+                    <div class="analytics-header">
+                        <div class="analytics-title-group">
+                            <i class="fa-solid fa-fire text-warning"></i>
+                            <div>
+                                <h4>Bugungi Mashq & Olovcha</h4>
+                            </div>
+                        </div>
+                        <div class="streak-badge-big">
+                            <i class="fa-solid fa-fire text-warning"></i>
+                            <span id="statsStreakDays">1</span> kun
+                        </div>
+                    </div>
+
+                    <div class="daily-goal-box">
+                        <div class="goal-text-row">
+                            <span>Bugun takrorlangan: <strong id="statsDailyLearnedCount">0</strong> / 5 ta so'z</span>
+                            <span id="statsDailyPercent">0%</span>
+                        </div>
+                        <div class="daily-goal-bar">
+                            <div class="daily-goal-fill" id="statsDailyGoalFill" style="width: 0%;"></div>
+                        </div>
+                        <p class="goal-tip" id="statsGoalTip">Bugungi maqsad sari oldinga! Fleshkarta yoki Test mashqini
+                            bajaring.</p>
+                    </div>
+
+                    <div class="stats-quick-actions">
+                        <button type="button" class="btn btn-primary btn-sm" id="btnStatsGoFlashcards">
+                            <i class="fa-solid fa-clone"></i> Fleshkartada takrorlash
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" id="btnStatsGoQuiz">
+                            <i class="fa-solid fa-circle-question"></i> Test topshirish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. ADD / EDIT WORD MODAL -->
+    <div class="modal-backdrop hidden" id="wordModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="wordModalTitle"><i class="fa-solid fa-plus-circle text-primary"></i> Yangi So'z Qo'shish</h3>
+                <button class="modal-close" id="btnCloseWordModal">&times;</button>
+            </div>
+            <form id="wordForm" class="modal-body">
+                <input type="hidden" id="editWordId" value="">
+
+                <div class="form-group">
+                    <label for="inputWord">Inglizcha so'z <span class="required">*</span></label>
+                    <div class="input-with-button">
+                        <input type="text" id="inputWord" placeholder="Persistence" required autofocus>
+                        <button type="button" class="btn btn-icon btn-sm" id="btnPreviewInputAudio"
+                            title="Talaffuzni tinglash">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputTranslation">O'zbekcha tarjima <span class="required">*</span></label>
+                    <input type="text" id="inputTranslation" placeholder="Qat'iyatlik, sabot" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="inputStudyDate">Yodlash kuni <span class="required">*</span></label>
+                    <div class="modal-date-picker-row">
+                        <input type="date" id="inputStudyDate" required>
+                        <div class="date-quick-btns">
+                            <button type="button" class="btn btn-outline btn-xs" id="btnDateToday">Bugun</button>
+                            <button type="button" class="btn btn-outline btn-xs" id="btnDateTomorrow">Ertaga</button>
+                            <button type="button" class="btn btn-outline btn-xs" id="btnDateYesterday">Kecha</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extra details collapsible accordion -->
+                <details class="extra-details-accordion" id="extraDetailsAccordion">
+                    <summary><i class="fa-solid fa-sliders"></i> Qo'shimcha ma'lumotlar</summary>
+                    <div class="extra-details-content">
+                        <div class="form-group">
+                            <label for="inputPhonetic">Transkripsiya</label>
+                            <input type="text" id="inputPhonetic" placeholder="/pəˈsɪstəns/">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputSynonyms"><i class="fa-solid fa-equals text-primary"></i> Sinonimlar</label>
+                            <input type="text" id="inputSynonyms" placeholder="persistent, tenacious, resolute">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputExample">Misol gap (Inglizcha)</label>
+                            <input type="text" id="inputExample" placeholder="Success requires persistence and hard work.">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputExampleTrans">Misol tarjimasi</label>
+                            <input type="text" id="inputExampleTrans" placeholder="Muvaffaqiyat qat'iyatlikni talab qiladi.">
+                        </div>
+                    </div>
+                </details>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnCancelWordModal">Bekor qilish</button>
+                    <button type="submit" class="btn btn-primary" id="btnSaveWord">
+                        <i class="fa-solid fa-floppy-disk"></i> Saqlash
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. STARTER PACKS MODAL (TAYYOR TO'PLAMLAR) -->
+    <div class="modal-backdrop hidden" id="packsModal">
+        <div class="modal-box modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles text-warning"></i> Tayyor To'plamlar</h3>
+                <button class="modal-close" id="btnClosePacksModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-instruction">Mavzuli to'plamni tanlang:</p>
+                <div class="packs-grid" id="packsGrid">
+                    <!-- Dynamic packs inserted via app.js -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnClosePacksModalBtn">Yopish</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 2. BULK ADD MODAL (OMMAVIY QO'SHISH) -->
+    <div class="modal-backdrop hidden" id="bulkModal">
+        <div class="modal-box modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-import text-primary"></i> Ommaviy Kiritish</h3>
+                <button class="modal-close" id="btnCloseBulkModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Minimalist Gemini AI Strip -->
+                <div class="gemini-minimal-strip">
+                    <div class="gemini-strip-left">
+                        <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
+                        <span>Gemini orqali so'zlarni ajratish:</span>
+                    </div>
+                    <div class="gemini-strip-actions">
+                        <button type="button" class="btn-copy-prompt" id="btnCopyGeminiPrompt"
+                            title="Gemini uchun tayyor promptni nusxalash">
+                            <i class="fa-regular fa-copy"></i> <span>Prompt nusxalash</span>
+                        </button>
+                        <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer"
+                            class="gemini-link-btn" title="Gemini-ni ochish">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Gemini
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Hidden prompt text for clipboard copy -->
+                <pre id="geminiPromptText" style="display: none;">Ushbu rasmdagi (matndagi) barcha yangi va muhim inglizcha so'zlarni, ularning o'zbekcha tarjimasi va sinonimlari bilan birga quyidagi qat'iy formatda chiqarib ber (boshqa hech qanday kirish so'zi, raqam yoki ortiqcha gap yozma, faqat ro'yxat bo'lsin):
+
+so'z - o'zbekcha tarjimasi - sinonim1, sinonim2
+
+Namuna:
+apple - olma - fruit
+perseverance - qat'iyat, matonat - persistence, endurance
+accurate - aniq, to'g'ri - precise, exact</pre>
+
+                <!-- Input Header Row with Inline Date -->
+                <div class="bulk-input-header">
+                    <label for="bulkTextArea">So'zlar ro'yxati <span class="text-muted">(so'z - tarjima - sinonim)</span>:</label>
+                    <div class="bulk-date-wrapper" title="Ushbu so'zlar uchun yodlash kuni">
+                        <i class="fa-regular fa-calendar text-muted"></i>
+                        <input type="date" id="bulkStudyDate" class="bulk-date-input-inline" required>
+                    </div>
+                </div>
+
+                <textarea id="bulkTextArea" class="bulk-textarea" rows="8"
+                    placeholder="apple - olma&#10;happy - baxtli - glad, joyful&#10;perseverance - qat'iyat - endurance"></textarea>
+
+                <div class="bulk-preview-info">
+                    Topilgan so'zlar: <strong id="bulkParsedCount" class="text-primary">0</strong> ta
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelBulkModal">Bekor qilish</button>
+                <button type="submit" class="btn btn-primary" id="btnSaveBulkWords">
+                    <i class="fa-solid fa-plus-circle"></i> Barchasini saqlash
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 3. EXPORT / IMPORT / BACKUP MODAL -->
+    <div class="modal-backdrop hidden" id="exportImportModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-arrow-right-arrow-left text-primary"></i> Ma'lumotlarni Zaxiralash</h3>
+                <button class="modal-close" id="btnCloseExportImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="backup-section">
+                    <h4><i class="fa-solid fa-download text-success"></i> Zaxira yuklash (Export)</h4>
+                    <div class="backup-actions">
+                        <button class="btn btn-primary" id="btnExportJSON">
+                            <i class="fa-solid fa-file-arrow-down"></i> JSON Yuklash
+                        </button>
+                        <button class="btn btn-outline" id="btnExportCSV">
+                            <i class="fa-solid fa-file-csv"></i> Excel (CSV)
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="modal-divider">
+
+                <div class="backup-section">
+                    <h4><i class="fa-solid fa-upload text-warning"></i> Zaxirani tiklash (Import)</h4>
+                    <input type="file" id="importFileInput" accept=".json" class="file-input">
+                    <button class="btn btn-secondary" id="btnTriggerFileSelect">
+                        <i class="fa-solid fa-folder-open"></i> JSON fayl tanlash...
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. ONBOARDING & EXPLANATORY ANIMATIONS MODAL -->
+    <div class="modal-backdrop hidden" id="tutorialModal" role="dialog" aria-modal="true" aria-labelledby="tutorialModalTitle">
+        <div class="modal-box modal-tour-dock">
+            <!-- Main Stage Area -->
+            <main class="tour-dock-main">
+                <div class="tour-progress-track tour-top-progress">
+                    <div class="tour-progress-fill" id="tutorialProgressFill" style="width: 16.6%;"></div>
+                </div>
+                <header class="tour-main-header">
+                    <span class="tour-stage-pill" id="tourStagePill">
+                        <i class="fa-solid fa-compass"></i> 1 / 6
+                    </span>
+                    <div class="tour-header-actions">
+                        <button type="button" class="tour-skip-action" id="btnSkipTutorial" title="Yo'riqnomani o'tkazib yuborish">
+                            <i class="fa-solid fa-forward-step"></i> <span>O'tkazib yuborish</span>
+                        </button>
+                        <button type="button" class="modal-close tour-close-btn" id="btnCloseTutorialModal" aria-label="Yopish">&times;</button>
+                    </div>
+                </header>
+
+                <div class="tour-main-scroll">
+                    <!-- Slides Container -->
+                    <div class="tutorial-slides-container" id="tutorialSlidesContainer">
+
+                        <!-- SLIDE 1: Kirish -->
+                        <div class="tutorial-slide active" data-step="1">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title" id="tutorialModalTitle">EasyLearn'ga Xush Kelibsiz</h2>
+                                <p class="tut-desc">
+                                    Inglizcha so'zlarni oson yodlash uchun shaxsiy lug'atingiz.
+                                </p>
+                            </div>
+
+                            <div class="tour-screen-card">
+                                <div class="tut-visual-box tut-welcome-visual">
+                                    <div class="tut-aura-pulse"></div>
+                                    <div class="tut-orbit-ring"></div>
+                                    <div class="tut-mascot-center">
+                                        <i class="fa-solid fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="tut-float-pill pill-1">
+                                        <i class="fa-solid fa-book-bookmark text-primary"></i> <span>Shaxsiy Lug'at</span>
+                                    </div>
+                                    <div class="tut-float-pill pill-2">
+                                        <i class="fa-solid fa-clone text-info"></i> <span>3D Fleshkarta</span>
+                                    </div>
+                                    <div class="tut-float-pill pill-3">
+                                        <i class="fa-solid fa-fire text-warning"></i> <span>Kunlik Zanjir</span>
+                                    </div>
+                                    <div class="tut-float-pill pill-4">
+                                        <i class="fa-solid fa-puzzle-piece text-danger"></i> <span>4 xil O'yin</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- SLIDE 2: So'z va Sinonim Qo'shish -->
+                        <div class="tutorial-slide" data-step="2">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title">So'z va Sinonim Qo'shish</h2>
+                                <p class="tut-desc">
+                                    So'z, tarjima va sinonimlarni kiriting. Sinonimlar alohida test va kartalarda mustahkamlanadi.
+                                </p>
+                            </div>
+
+                            <div class="tour-screen-card">
+                                <div class="tut-visual-box tut-quickadd-visual">
+                                    <div class="tut-mock-browser">
+                                        <div class="tut-mock-bar">
+                                            <div class="tut-mock-input en-mock">
+                                                <span class="mock-badge">EN</span>
+                                                <span class="mock-typing-text typing-en">Perseverance</span>
+                                            </div>
+                                            <div class="tut-mock-input uz-mock">
+                                                <span class="mock-badge">UZ</span>
+                                                <span class="mock-typing-text typing-uz">Matonat, qat'iyat</span>
+                                            </div>
+                                            <div class="tut-mock-btn">
+                                                <i class="fa-solid fa-plus"></i>
+                                                <span>Qo'shish</span>
+                                            </div>
+                                            <div class="tut-virtual-cursor">
+                                                <i class="fa-solid fa-arrow-pointer"></i>
+                                            </div>
+                                        </div>
+
+                                        <!-- Highlighted Synonym Input Row -->
+                                        <div class="tut-mock-syn-row">
+                                            <div class="tut-mock-syn-input">
+                                                <span class="mock-badge syn-badge"><i class="fa-solid fa-equals"></i> Sinonim:</span>
+                                                <span class="mock-syn-text">persistence, endurance, tenacity</span>
+                                            </div>
+                                            <span class="mock-syn-tag"><i class="fa-solid fa-check"></i> Testga qo'shiladi</span>
+                                        </div>
+
+                                        <div class="tut-mock-saved-card">
+                                            <div class="mock-card-content">
+                                                <i class="fa-solid fa-circle-check text-primary"></i>
+                                                <strong>Perseverance</strong>
+                                                <span class="mock-card-trans">— Matonat, qat'iyat</span>
+                                                <span class="mock-card-syn"><i class="fa-solid fa-equals"></i> persistence, endurance</span>
+                                            </div>
+                                            <span class="mock-card-pill">Saqlandi</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 3: Ommaviy Kiritish (Bulk Import) -->
+                        <div class="tutorial-slide" data-step="3">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title">Ommaviy Kiritish (Bulk Import)</h2>
+                                <p class="tut-desc">
+                                    50-100 tagacha so'zlarni bitta maydonga nusxalab tashlang yoki AI yordamida bir zumda yuklang.
+                                </p>
+                            </div>
+
+                            <div class="tour-screen-card">
+                                <div class="tut-visual-box tut-bulk-visual">
+                                    <div class="tut-bulk-editor-mock">
+                                        <div class="tut-bulk-editor-head">
+                                            <span class="bulk-mock-title"><i class="fa-solid fa-file-lines text-primary"></i> Matn / Ro'yxat formati</span>
+                                            <span class="bulk-mock-counter"><i class="fa-solid fa-circle-check text-primary"></i> 3 ta so'z topildi</span>
+                                        </div>
+                                        <div class="tut-bulk-lines">
+                                            <div class="bulk-line">
+                                                <span class="bl-word">apple</span>
+                                                <span class="bl-sep">-</span>
+                                                <span class="bl-trans">olma</span>
+                                            </div>
+                                            <div class="bulk-line">
+                                                <span class="bl-word">perseverance</span>
+                                                <span class="bl-sep">-</span>
+                                                <span class="bl-trans">qat'iyat</span>
+                                                <span class="bl-sep">-</span>
+                                                <span class="bl-syn">endurance</span>
+                                            </div>
+                                            <div class="bulk-line">
+                                                <span class="bl-word">accurate</span>
+                                                <span class="bl-sep">:</span>
+                                                <span class="bl-trans">aniq, to'g'ri</span>
+                                                <span class="bl-sep">:</span>
+                                                <span class="bl-syn">precise</span>
+                                            </div>
+                                        </div>
+                                        <div class="tut-bulk-footer-mock">
+                                            <span class="bulk-mock-tag"><i class="fa-solid fa-wand-magic-sparkles text-warning"></i> Gemini AI Prompt</span>
+                                            <button type="button" class="btn btn-primary btn-sm mock-save-btn">
+                                                <i class="fa-solid fa-plus-circle"></i> Barchasini saqlash
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 4: 3D Fleshkartalar -->
+                        <div class="tutorial-slide" data-step="4">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title">Fleshkartalar</h2>
+                                <p class="tut-desc">
+                                    Kartani aylantiring, talaffuzni eshiting va bilim darajangizni belgilang.
+                                </p>
+                            </div>
+
+                            <div class="tour-screen-card">
+                                <div class="tut-visual-box tut-flashcard-visual">
+                                    <div class="tut-card-3d-scene">
+                                        <div class="tut-card-3d-flipper">
+                                            <div class="tut-card-face tut-card-front">
+                                                <span class="tut-card-badge">Old tomoni (EN)</span>
+                                                <h3 class="tut-card-word">Opportunity</h3>
+                                                <span class="tut-card-phonetic">/ˌɒp.əˈtjuː.nə.ti/</span>
+                                                <div class="tut-sound-pulse-ring">
+                                                    <i class="fa-solid fa-volume-high"></i>
+                                                </div>
+                                                <span class="tut-card-subhint"><i class="fa-solid fa-rotate"></i> Aylantirish uchun bosing</span>
+                                            </div>
+
+                                            <div class="tut-card-face tut-card-back">
+                                                <span class="tut-card-badge">Orqa tomoni (UZ)</span>
+                                                <h3 class="tut-card-word">Imkoniyat, qulay sharoit</h3>
+                                                <p class="tut-card-example">"Grab every opportunity to learn."</p>
+                                                <div class="tut-card-levels-demo">
+                                                    <span class="tut-lvl-btn red">[1] Qayta</span>
+                                                    <span class="tut-lvl-btn yellow">[2] Yaxshi</span>
+                                                    <span class="tut-lvl-btn green">[3] Yodlandi</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 5: 4 xil Mashq -->
+                        <div class="tutorial-slide" data-step="5">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title">4 xil Mashq</h2>
+                                <p class="tut-desc">
+                                    Test, yozish, juftlik va sinonim mashqlari bilan so'zlarni mustahkamlang.
+                                </p>
+                            </div>
+
+                            <div class="tour-screen-card">
+                                <div class="tut-visual-box tut-games-visual">
+                                    <div class="tut-games-quad">
+                                        <div class="tut-game-tile tile-quiz">
+                                            <div class="tut-tile-header">
+                                                <i class="fa-solid fa-circle-question text-primary"></i>
+                                                <strong>Variantli Test</strong>
+                                            </div>
+                                            <div class="tut-mini-options">
+                                                <span class="opt">Kitob</span>
+                                                <span class="opt correct"><i class="fa-solid fa-check"></i> Imkoniyat <span class="score-popup">+10 ball <i class="fa-solid fa-bolt text-warning"></i></span></span>
+                                                <span class="opt">Harakat</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tut-game-tile tile-writing">
+                                            <div class="tut-tile-header">
+                                                <i class="fa-solid fa-keyboard text-info"></i>
+                                                <strong>Yozma Mashq</strong>
+                                            </div>
+                                            <div class="tut-mini-spelling">
+                                                <span class="letter">S</span>
+                                                <span class="letter">U</span>
+                                                <span class="letter">C</span>
+                                                <span class="letter">C</span>
+                                                <span class="letter active-letter">E</span>
+                                                <span class="letter">S</span>
+                                                <span class="letter">S</span>
+                                            </div>
+                                            <span class="hint-demo"><i class="fa-solid fa-lightbulb text-warning"></i> 1 ta harf maslahat</span>
+                                        </div>
+
+                                        <div class="tut-game-tile tile-matching">
+                                            <div class="tut-tile-header">
+                                                <i class="fa-solid fa-puzzle-piece text-warning"></i>
+                                                <strong>Juftlik O'yini</strong>
+                                            </div>
+                                            <div class="tut-mini-pairs">
+                                                <span class="match-chip chip-en active-match">Perseverance</span>
+                                                <span class="match-sparkle"><i class="fa-solid fa-bolt"></i></span>
+                                                <span class="match-chip chip-uz active-match">Matonat</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="tut-game-tile tile-synonym">
+                                            <div class="tut-tile-header">
+                                                <i class="fa-solid fa-equals text-danger"></i>
+                                                <strong>Sinonim Testi</strong>
+                                            </div>
+                                            <div class="tut-mini-synonyms">
+                                                <span class="syn-badge main">Accurate</span>
+                                                <i class="fa-solid fa-arrows-left-right text-muted"></i>
+                                                <span class="syn-badge target">Precise, Exact</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SLIDE 6: Boshlash -->
+                        <div class="tutorial-slide" data-step="6">
+                            <div class="tut-content-box">
+                                <h2 class="tut-title">Boshlaymiz</h2>
+                                <p class="tut-desc">
+                                    Qanday boshlashni tanlang:
+                                </p>
+                            </div>
+
+                            <div class="tut-choice-cards">
+                                <div class="tut-choice-card recommended" id="tutCardChoiceA1">
+                                    <div class="tut-choice-badge">Tavsiya etiladi</div>
+                                    <div class="tut-choice-left">
+                                        <div class="tut-choice-icon-box bg-primary-soft">
+                                            <i class="fa-solid fa-bolt text-primary"></i>
+                                        </div>
+                                        <div class="tut-choice-text">
+                                            <h4>A1-A2 Boshlang'ich To'plam (Top 30)</h4>
+                                            <p>30 ta asosiy so'z bilan darhol boshlash</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnTutorialLoadA1">
+                                        <i class="fa-solid fa-download"></i> Yuklab boshlash
+                                    </button>
+                                </div>
+
+                                <div class="tut-choice-card" id="tutCardChoiceFresh">
+                                    <div class="tut-choice-left">
+                                        <div class="tut-choice-icon-box bg-secondary-soft">
+                                            <i class="fa-solid fa-pen-to-square text-secondary"></i>
+                                        </div>
+                                        <div class="tut-choice-text">
+                                            <h4>O'zim so'z kiritib boshlayman</h4>
+                                            <p>Bo'sh lug'atdan o'z so'zlaringiz bilan</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline btn-sm" id="btnTutorialStartFresh">
+                                        <i class="fa-solid fa-arrow-right"></i> O'zim kiritaman
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer Navigation Bar -->
+                <footer class="tour-dock-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnTutorialPrev" disabled>
+                        <i class="fa-solid fa-chevron-left"></i> Oldingisi
+                    </button>
+
+                    <!-- Interactive Step Dots -->
+                    <div class="tutorial-dots" id="tutorialDots">
+                        <button type="button" class="tutorial-dot active" data-index="0" aria-label="1-qadam: Kirish"></button>
+                        <button type="button" class="tutorial-dot" data-index="1" aria-label="2-qadam: So'z va sinonim"></button>
+                        <button type="button" class="tutorial-dot" data-index="2" aria-label="3-qadam: Ommaviy kiritish"></button>
+                        <button type="button" class="tutorial-dot" data-index="3" aria-label="4-qadam: Fleshkarta"></button>
+                        <button type="button" class="tutorial-dot" data-index="4" aria-label="5-qadam: 4 xil mashq"></button>
+                        <button type="button" class="tutorial-dot" data-index="5" aria-label="6-qadam: Boshlash"></button>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-sm" id="btnTutorialNext">
+                        <span id="btnTutorialNextText">Keyingisi</span> <i class="fa-solid fa-chevron-right" id="btnTutorialNextIcon"></i>
+                    </button>
+                </footer>
+            </main>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (FAB) for Instant Word Adding -->
+    <button class="fab-btn" id="fabAddWord" aria-label="Yangi so'z qo'shish" title="Yangi so'z qo'shish">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- Bottom Navigation Bar (Mobile Native App Experience) -->
+    <nav class="bottom-nav" id="bottomNav" aria-label="Mobil asosiy menyu">
+        <button class="bottom-nav-item active" data-view="vocabulary" aria-label="Lug'at">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-list-ul"></i>
+                <span class="bottom-nav-badge" id="bottomNavVocabBadge">0</span>
+            </div>
+            <span class="bottom-nav-label">Lug'at</span>
+        </button>
+        <button class="bottom-nav-item" data-view="flashcards" aria-label="Fleshkarta">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-clone"></i>
+            </div>
+            <span class="bottom-nav-label">Karta</span>
+        </button>
+        <button class="bottom-nav-item" data-view="quiz" aria-label="Test">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <span class="bottom-nav-label">Test</span>
+        </button>
+        <button class="bottom-nav-item" data-view="writing" aria-label="Yozish">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-keyboard"></i>
+            </div>
+            <span class="bottom-nav-label">Yozish</span>
+        </button>
+        <button class="bottom-nav-item" data-view="matching" aria-label="Juftlik">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-puzzle-piece"></i>
+            </div>
+            <span class="bottom-nav-label">Juftlik</span>
+        </button>
+        <button class="bottom-nav-item" data-view="synonymquiz" aria-label="Sinonim">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-equals"></i>
+            </div>
+            <span class="bottom-nav-label">Sinonim</span>
+        </button>
+        <button class="bottom-nav-item" data-view="stats" aria-label="Statistika">
+            <div class="bottom-nav-icon-wrap">
+                <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <span class="bottom-nav-label">Stat</span>
+        </button>
+    </nav>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+
+</html>
