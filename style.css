@@ -89,50 +89,7 @@
     --trans-normal: 0.24s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ==========================================================================
-   Dark Theme Overrides (Obsidian & Deep Midnight Slate)
-   ========================================================================== */
-[data-theme="dark"] {
-    color-scheme: dark;
-    --bg-body:           #0b0f19;
-    --bg-surface:        #111827;
-    --bg-surface-subtle: #1e293b;
-    --bg-surface-hover:  #334155;
 
-    --border-subtle:     #1e293b;
-    --border-medium:     #334155;
-    --border-focus:      #60a5fa;
-
-    --text-main:         #f8fafc;
-    --text-secondary:    #cbd5e1;
-    --text-muted:        #94a3b8;
-
-    --primary:           #60a5fa;
-    --primary-hover:     #93c5fd;
-    --primary-deep:      #3b82f6;
-    --primary-light:     rgba(59, 130, 246, 0.16);
-    --primary-border:    rgba(96, 165, 250, 0.35);
-    --primary-gradient:  linear-gradient(135deg, #93c5fd 0%, #3b82f6 100%);
-    --primary-glow:      rgba(59, 130, 246, 0.45);
-
-    --success:           #38bdf8;
-    --success-light:     rgba(56, 189, 248, 0.16);
-    --success-border:    rgba(56, 189, 248, 0.35);
-
-    --warning:           #f59e0b;
-    --warning-light:     rgba(245, 158, 11, 0.16);
-    --warning-border:    rgba(245, 158, 11, 0.35);
-
-    --danger:            #f43f5e;
-    --danger-light:      rgba(244, 63, 94, 0.16);
-    --danger-border:     rgba(244, 63, 94, 0.35);
-
-    --shadow-xs:         0 1px 2px rgba(0, 0, 0, 0.5);
-    --shadow-sm:         0 2px 6px rgba(0, 0, 0, 0.6);
-    --shadow-md:         0 6px 18px rgba(0, 0, 0, 0.7);
-    --shadow-lg:         0 14px 32px rgba(0, 0, 0, 0.8);
-    --shadow-modal:      0 26px 52px rgba(0, 0, 0, 0.9);
-}
 
 /* ==========================================================================
    Base Styles & Reset
@@ -319,27 +276,7 @@ button, input, select, textarea {
     gap: 8px;
 }
 
-.btn-theme-toggle {
-    width: 34px;
-    height: 34px;
-    border-radius: var(--radius-sm);
-    color: var(--text-main);
-    background-color: var(--bg-surface-subtle);
-    border: 1px solid var(--border-subtle);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: all var(--trans-fast);
-}
 
-.btn-theme-toggle:hover {
-    background-color: var(--bg-surface-hover);
-    border-color: var(--border-medium);
-    color: var(--warning);
-    transform: rotate(15deg);
-}
 
 .kbd-badge {
     display: inline-flex;
@@ -356,10 +293,7 @@ button, input, select, textarea {
     border-radius: var(--radius-xs);
     margin-left: 6px;
 }
-[data-theme="dark"] .kbd-badge {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.25);
-}
+
 
 .btn-sound-card.is-speaking,
 .btn-action-icon.is-speaking,
@@ -480,9 +414,7 @@ button, input, select, textarea {
 .fab-btn:active {
     transform: scale(0.92);
 }
-[data-theme="dark"] .fab-btn {
-    box-shadow: 0 8px 28px rgba(37, 99, 235, 0.55);
-}
+
 
 /* Quick Add Header (Desktop hidden) */
 .quick-add-header {
@@ -833,10 +765,7 @@ button, input, select, textarea {
     background-color: rgba(59, 130, 246, 0.12);
     color: #2563eb;
 }
-[data-theme="dark"] .input-lang-badge.uz {
-    background-color: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-}
+
 .input-lang-badge.date {
     background-color: var(--bg-surface-hover);
     color: var(--text-secondary);
@@ -1212,17 +1141,7 @@ button, input, select, textarea {
     background-color: var(--success);
 }
 
-[data-theme="dark"] .level-badge.learning {
-    background-color: rgba(245, 158, 11, 0.18);
-    color: #fbbf24;
-    border-color: rgba(245, 158, 11, 0.4);
-}
 
-[data-theme="dark"] .level-badge.mastered {
-    background-color: rgba(37, 99, 235, 0.18);
-    color: #60a5fa;
-    border-color: rgba(37, 99, 235, 0.4);
-}
 
 /* Card Actions (Gently visible, full on hover/focus) */
 .card-actions-group {
